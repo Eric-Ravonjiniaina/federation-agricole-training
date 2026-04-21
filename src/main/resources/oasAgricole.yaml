@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: API Fédération Collectivités Agricoles
+  version: 1.0.0
+
+paths:
+  /collectivites:
+    post:
+      summary: Ouverture d’une nouvelle collectivité
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Collectivite'
+      responses:
+        '201':
+          description: Collectivité créée avec succès
+
+  /membres:
+    post:
+      summary: Admission d’un nouveau membre
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Membre'
+      responses:
+        '201':
+          description: Membre admis avec succès
+
+  /cotisations:
+    post:
+      summary: Enregistrement d’une cotisation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cotisation'
+      responses:
+        '201':
+          description: Cotisation enregistrée
+
+components:
+  schemas:
+    Collectivite:
+      type: object
+      properties:
+        id:
+          type: string
+        nom:
+          type: string
+        ville:
+          type: string
+        specialite:
+          type: string
+        dateCreation:
+          type: string
+          format: date
+        membres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Membre'
+
+    Membre:
+      type: object
+      properties:
+        id:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        dateNaissance:
+          type: string
+          format: date
+        genre:
+          type: string
+          enum: [masculin, feminin]
+        adresse:
+          type: string
+        metier:
+          type: string
+        telephone:
+          type: string
+        email:
+          type: string
+        dateAdhesion:
+          type: string
+          format: date
+        poste:
+          type: string
+          enum: [president, presidentAdjoint, tresorier, secretaire, membreConfirme, membreJunior]
+
+    Cotisation:
+      type: object
+      properties:
+        id:
+          type: string
+        membreId:
+          type: string
+        montant:
+          type: number
+        date:
+          type: string
+          format: date
+        modePaiement:
+          type: string
+          enum: [espece, virement, mobileMoney]
