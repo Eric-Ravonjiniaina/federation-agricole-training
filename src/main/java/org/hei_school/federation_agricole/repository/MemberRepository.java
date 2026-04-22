@@ -30,19 +30,19 @@ public class MemberRepository {
         }
     }
 
-        public String save (MemberEntity m, String collId) throws SQLException {
-            String sql = "INSERT INTO membres (id, first_name, last_name, coll_id) VALUES (?, ?, ?, ?)";
-            try (Connection conn = dataSource.getConnection()) {
-                try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    ps.setInt(1, m.getId());
-                    ps.setString(2, m.getFirstName());
-                    ps.setString(3, m.getLastName());
-                    ps.setString(4, collId);
-                    ps.executeUpdate();
-                }
-                return sql;
+    public String save(MemberEntity m, String collId) throws SQLException {
+        String sql = "INSERT INTO membres (id, first_name, last_name, coll_id) VALUES (?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, m.getId());
+                ps.setString(2, m.getFirstName());
+                ps.setString(3, m.getLastName());
+                ps.setString(4, collId);
+                ps.executeUpdate();
             }
+            return m.getId();
         }
+    }
 
         public Optional<MemberEntity> findById (String id){
 
@@ -66,4 +66,4 @@ public class MemberRepository {
             }
         }
     }
-}
+

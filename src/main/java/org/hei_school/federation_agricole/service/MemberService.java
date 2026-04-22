@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
-import java.util.UUID;
 
 public class MemberService{
     private final MemberRepository repository;
@@ -32,7 +31,7 @@ public class MemberService{
         m.setLastName(dto.lastName);
         String generatedId = repository.save(m, dto.collectivityIdentifier);
 
-        m.setId(Integer.parseInt(generatedId));
+        m.setId(generatedId);
 
         return m;
     }
@@ -47,7 +46,7 @@ public class MemberService{
 
             if (rs.next()) {
                 MemberEntity m = new MemberEntity();
-                m.setId(rs.getInt("id"));
+                m.setId(rs.getString("id"));
                 return Optional.of(m);
             }
 

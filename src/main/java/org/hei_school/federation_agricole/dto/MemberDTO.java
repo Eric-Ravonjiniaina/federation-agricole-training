@@ -3,7 +3,7 @@ package org.hei_school.federation_agricole.dto;
 import java.util.List;
 
 public class MemberDTO {
-    private int id;
+    private String id;
     public String firstName;
     public String lastName;
     public String birthDate;
@@ -12,11 +12,11 @@ public class MemberDTO {
     public boolean registrationFeePaid;
     public boolean membershipDuesPaid;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

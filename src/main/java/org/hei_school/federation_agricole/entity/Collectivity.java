@@ -8,6 +8,7 @@ public class Collectivity {
     private CollectivityStructure structure;
     private List<MemberEntity> members;
 
+
     public Collectivity() {
     }
 

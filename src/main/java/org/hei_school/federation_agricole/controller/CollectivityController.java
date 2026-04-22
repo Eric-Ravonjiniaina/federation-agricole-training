@@ -2,13 +2,12 @@ package org.hei_school.federation_agricole.controller;
 
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.dto.response.CollectivityResponse;
+import org.hei_school.federation_agricole.entity.Collectivity;
 import org.hei_school.federation_agricole.mapper.CollectivityMapper;
 import org.hei_school.federation_agricole.service.CollectivityService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
