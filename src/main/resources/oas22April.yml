@@ -5,7 +5,8 @@ info:
     # Versioning
     This API uses semantic versioning (MAJOR.MINOR.PATCH). Available versions are : 
     - v0.0.1 (2026-04-21) : POST /collectivities for collectivities creation and POST /members for members creation.
-  version: 0.0.1
+    - v0.0.2 (2026-04-22) : Assign number and name to collectivities
+  version: 0.0.2
 servers:
   - url: 'https://localhost:8080'
 paths:
@@ -61,6 +62,40 @@ paths:
             - Membership dues not paid or registration fee not paid.
         404:
           description: Either collectivity or member not found.
+  '/collectivities/{id}/identity':
+    put:
+      summary: Assign unique number and name to a collectivity
+      description: |
+        This endpoint allows the federation to assign a unique number and name 
+        to a collectivity. Once assigned, they cannot be modified.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Collectivity identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCollectivityIdentity'
+      responses:
+        200:
+          description: Collectivity with assigned number and name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collectivity'
+        400:
+          description: |
+            - Name already exists
+            - Number already exists
+        404:
+          description: Collectivity not found
+        409:
+          description: Identity already assigned and cannot be modified
 components:
   schemas:
     CreateCollectivity:
@@ -104,6 +139,10 @@ components:
       properties:
         id:
           type: string
+        number:
+          type: string
+        name:
+          type: string
         location:
           type: string
         structure:
@@ -112,6 +151,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Member'
+    AssignCollectivityIdentity:
+      type: object
+      required:
+        - number
+        - name
+      properties:
+        number:
+          type: string
+          description: Unique collectivity number assigned by federation
+        name:
+          type: string
+          description: Unique collectivity name
     MemberIdentifier:
       type: string
     CreateMember:
