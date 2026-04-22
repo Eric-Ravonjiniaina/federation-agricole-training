@@ -5,17 +5,37 @@ import java.util.List;
 public class Collectivity {
     private String id;
     private String location;
+    private String number;
+    private String name;
     private CollectivityStructure structure;
     private List<MemberEntity> members;
 
     public Collectivity() {
     }
 
-    public Collectivity(String id, String location, CollectivityStructure structure, List<MemberEntity> members) {
+    public Collectivity(String id, String location, String number, String name, CollectivityStructure structure, List<MemberEntity> members) {
         this.id = id;
         this.location = location;
+        this.number = number;
+        this.name = name;
         this.structure = structure;
         this.members = members;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getId() {

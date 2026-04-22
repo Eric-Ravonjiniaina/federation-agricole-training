@@ -1,10 +1,12 @@
 package org.hei_school.federation_agricole.service;
 
+import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.entity.Collectivity;
 import org.hei_school.federation_agricole.entity.CollectivityStructure;
 import org.hei_school.federation_agricole.entity.MemberEntity;
 import org.hei_school.federation_agricole.exception.BadRequestException;
+import org.hei_school.federation_agricole.exception.ConflictException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
 import org.hei_school.federation_agricole.repository.CollectivityRepository;
 import org.hei_school.federation_agricole.repository.MemberRepository;
@@ -95,4 +97,26 @@ public class CollectivityService {
         return c;
     }
 
+    public Collectivity assignIdentity(String id, AssignCollectivityIdentityRequest req) {
+
+        Collectivity c = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Collectivity not found"));
+
+
+        if (c.getName() != null || c.getNumber() != null) {
+            throw new ConflictException("Identity already assigned");
+        }
+        if (repo.existsByName(req.getName())) {
+            throw new BadRequestException("Name already exists");
+        }
+        if (repo.existsByNumber(req.getNumber())) {
+            throw new BadRequestException("Number already exists");
+        }
+        repo.updateIdentity(id, req.getNumber(), req.getName());
+
+        c.setName(req.getName());
+        c.setNumber(req.getNumber());
+
+        return c;
+    }
 }
