@@ -74,7 +74,7 @@ public class CollectivityService {
         s.setSecretary(getMember(req.getStructure().getSecretary()));
 
         // validation structure
-        Set<Integer> ids = new HashSet<>();
+        Set<String> ids = new HashSet<>();
         for (MemberEntity m : members) ids.add(m.getId());
 
         if (!ids.contains(s.getPresident().getId()) ||
