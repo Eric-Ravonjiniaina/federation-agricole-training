@@ -2,6 +2,7 @@ package org.hei_school.federation_agricole.repository;
 
 import org.hei_school.federation_agricole.config.DataSource;
 import org.hei_school.federation_agricole.entity.MemberEntity;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,8 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import static java.lang.StableValue.map;
-
+@Repository
 public class MemberRepository {
     private final DataSource dataSource;
 
@@ -44,26 +44,37 @@ public class MemberRepository {
         }
     }
 
-        public Optional<MemberEntity> findById (String id){
+    public Optional<MemberEntity> findById(String id) {
 
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(
-                         "SELECT * FROM members WHERE id = ?")) {
+        String sql = "SELECT * FROM members WHERE id = ?";
 
-                ps.setString(1, id);
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-                ResultSet rs = ps.executeQuery();
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
 
-                if (rs.next()) {
-                    MemberEntity m = map(rs);
-                    return Optional.of(m);
-                }
-
-                return Optional.empty();
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
             }
+
+            return Optional.empty();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private MemberEntity mapRow(ResultSet rs) throws Exception {
+
+        MemberEntity m = new MemberEntity();
+
+        m.setId(rs.getString("id"));
+        m.setFirstName(rs.getString("first_name"));
+        m.setLastName(rs.getString("last_name"));
+
+
+        return m;
+    }
     }
 

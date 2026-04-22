@@ -4,24 +4,29 @@ import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentity
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.entity.Collectivity;
 import org.hei_school.federation_agricole.entity.CollectivityStructure;
+import org.hei_school.federation_agricole.entity.CollectivityTransaction;
 import org.hei_school.federation_agricole.entity.MemberEntity;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.ConflictException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
 import org.hei_school.federation_agricole.repository.CollectivityRepository;
 import org.hei_school.federation_agricole.repository.MemberRepository;
+import org.hei_school.federation_agricole.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
 public class CollectivityService {
 
+    private final TransactionRepository transactionRepository;
     private final CollectivityRepository repo;
     private final MemberRepository memberRepo;
 
 
-    public CollectivityService(CollectivityRepository repo, MemberRepository memberRepo) {
+    public CollectivityService(TransactionRepository transactionRepository, CollectivityRepository repo, MemberRepository memberRepo) {
+        this.transactionRepository = transactionRepository;
         this.repo = repo;
         this.memberRepo = memberRepo;
     }
@@ -118,5 +123,22 @@ public class CollectivityService {
         c.setNumber(req.getNumber());
 
         return c;
+    }
+
+    public List<CollectivityTransaction> getTransactions(
+            String id,
+            LocalDate from,
+            LocalDate to
+    ) {
+
+        // vérifier collectivité existe
+        repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Collectivity not found"));
+
+        if (from.isAfter(to)) {
+            throw new BadRequestException("Invalid date range");
+        }
+
+        return transactionRepository.findByCollectivityAndPeriod(id, from, to);
     }
 }
