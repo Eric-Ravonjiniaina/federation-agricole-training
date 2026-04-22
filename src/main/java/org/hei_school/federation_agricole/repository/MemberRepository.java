@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class MemberRepository {
     private final Connection connection;
@@ -32,5 +33,27 @@ public class MemberRepository {
             ps.executeUpdate();
         }
         return sql;
+    }
+
+    public Optional<MemberEntity> findById(String id) {
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT * FROM members WHERE id = ?")) {
+
+            ps.setString(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                MemberEntity m = map(rs);
+                return Optional.of(m);
+            }
+
+            return Optional.empty();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
