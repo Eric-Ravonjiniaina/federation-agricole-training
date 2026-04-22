@@ -5,6 +5,7 @@ import org.hei_school.federation_agricole.dto.MemberDTO;
 import org.hei_school.federation_agricole.entity.MemberEntity;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.repository.MemberRepository;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
