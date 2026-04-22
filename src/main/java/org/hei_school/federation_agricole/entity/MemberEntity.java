@@ -34,7 +34,7 @@ public class MemberEntity {
         this.referees = referees;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
     public void setId(String id) {

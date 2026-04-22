@@ -23,7 +23,7 @@ CREATE TABLE collectivite (
 -- 3. TABLE MEMBRE
 -- Élagage : suppression de l'adresse et de la profession si non critiques
 CREATE TABLE membre (
-                        id                    SERIAL PRIMARY KEY,
+                        id                    VARCHAR,
                         collectivity_id       INTEGER REFERENCES collectivite(id) ON DELETE SET NULL,
                         first_name            VARCHAR(100) NOT NULL,
                         last_name             VARCHAR(100) NOT NULL,
@@ -37,20 +37,17 @@ CREATE TABLE membre (
                         created_at            TIMESTAMP DEFAULT NOW()
 );
 
--- 4. TABLES DE JOINTURE ET RELATIONS
--- Pour gérer les parrains (List<MemberEntity> referees en Java)
 CREATE TABLE membre_referees (
-                                 member_id   INTEGER REFERENCES membre(id) ON DELETE CASCADE,
-                                 referee_id  INTEGER REFERENCES membre(id) ON DELETE CASCADE,
+    -- On remplace INTEGER par VARCHAR(50) pour correspondre à la table membre
+                                 member_id   VARCHAR(50) REFERENCES membre(id) ON DELETE CASCADE,
+                                 referee_id  VARCHAR(50) REFERENCES membre(id) ON DELETE CASCADE,
                                  PRIMARY KEY (member_id, referee_id),
                                  CONSTRAINT no_self_referral CHECK (member_id <> referee_id)
 );
 
--- Table optionnelle si un membre peut appartenir à plusieurs collectivités
--- Sinon, la FK collectivity_id dans 'membre' suffit.
 CREATE TABLE collectivite_membres (
-                                      collectivity_id  INTEGER REFERENCES collectivite(id) ON DELETE CASCADE,--C'est une réaction en chaîne. Tu supprimes le "Parent", et la base de données fait le ménage des "Enfants" toute seule.
-                                      member_id        INTEGER REFERENCES membre(id) ON DELETE CASCADE,
-                                      PRIMARY KEY (collectivity_id, member_id) --Cela sert à garantir qu'un membre ne peut pas être ajouté deux fois dans la même collectivité.
+                                      collectivity_id  INTEGER REFERENCES collectivite(id) ON DELETE CASCADE,
+                                      member_id        VARCHAR(50) REFERENCES membre(id) ON DELETE CASCADE,
+                                      PRIMARY KEY (collectivity_id, member_id)
 );
 
