@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 public class MemberEntity {
-    private int id;
+    private String id;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -20,7 +20,7 @@ public class MemberEntity {
 
     }
 
-    public MemberEntity(int id,String firstName, String lastName, LocalDate birthDate, GenderEnum gender, String adress, String profession, int phoneNumber, String email, MemberOccupation occupation, List<MemberEntity> referees) {
+    public MemberEntity(String id,String firstName, String lastName, LocalDate birthDate, GenderEnum gender, String adress, String profession, int phoneNumber, String email, MemberOccupation occupation, List<MemberEntity> referees) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -34,10 +34,10 @@ public class MemberEntity {
         this.referees = referees;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

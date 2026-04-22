@@ -40,7 +40,7 @@ public class CollectivityRepository {
                         "INSERT INTO collectivity_members VALUES (?, ?)");
                 for (MemberEntity m : c.getMembers()) {
                     ps2.setString(1, c.getId());
-                    ps2.setInt(2, m.getId());
+                    ps2.setString(2, m.getId());
                     ps2.addBatch();
                 }
                 ps2.executeBatch();
@@ -49,10 +49,10 @@ public class CollectivityRepository {
                 PreparedStatement ps3 = conn.prepareStatement(
                         "INSERT INTO collectivity_structure VALUES (?, ?, ?, ?, ?)");
                 ps3.setString(1, c.getId());
-                ps3.setInt(2, c.getStructure().getPresident().getId());
-                ps3.setInt(3, c.getStructure().getVicePresident().getId());
-                ps3.setInt(4, c.getStructure().getTreasurer().getId());
-                ps3.setInt(5, c.getStructure().getSecretary().getId());
+                ps3.setString(2, c.getStructure().getPresident().getId());
+                ps3.setString(3, c.getStructure().getVicePresident().getId());
+                ps3.setString(4, c.getStructure().getTreasurer().getId());
+                ps3.setString(5, c.getStructure().getSecretary().getId());
                 ps3.executeUpdate();
 
                 conn.commit();

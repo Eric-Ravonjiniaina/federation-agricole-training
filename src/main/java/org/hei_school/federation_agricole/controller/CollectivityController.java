@@ -1,12 +1,14 @@
 package org.hei_school.federation_agricole.controller;
 
-import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.dto.response.CollectivityResponse;
 import org.hei_school.federation_agricole.mapper.CollectivityMapper;
 import org.hei_school.federation_agricole.service.CollectivityService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,15 +29,5 @@ public class CollectivityController {
                 .stream()
                 .map(CollectivityMapper::toResponse)
                 .toList();
-    }
-
-    @PutMapping("/{id}/identity")
-    public CollectivityResponse assignIdentity(
-            @PathVariable String id,
-            @RequestBody AssignCollectivityIdentityRequest req
-    ) {
-        return CollectivityMapper.toResponse(
-                service.assignIdentity(id, req)
-        );
     }
 }
