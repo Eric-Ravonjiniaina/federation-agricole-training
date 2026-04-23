@@ -10,6 +10,8 @@ public class CollectivityTransaction {
     private double amount;
     private String paymentMode;
     private LocalDate creationDate;
+    private FinancialAccount accountCredited;
+    private MemberEntity memberDebited;
 
     public String getId() {
         return id;
@@ -58,4 +60,21 @@ public class CollectivityTransaction {
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
     }
+
+    public FinancialAccount getAccountCredited() {
+        return accountCredited;
+    }
+
+    public MemberEntity getMemberDebited() {
+        return memberDebited;
+    }
+
+    public void setAccountCredited(FinancialAccount account) {
+        this.accountCredited = account;
+    }
+
+    public void setMemberDebited(MemberEntity member) {
+        this.memberDebited = member;
+    }
+
 }

@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
 
+@Service
 public class MemberService{
     private final MemberRepository repository;
     private final DataSource dataSource;

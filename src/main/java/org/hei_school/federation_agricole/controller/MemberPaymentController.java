@@ -1,5 +1,6 @@
 package org.hei_school.federation_agricole.controller;
 
+import org.hei_school.federation_agricole.dto.CreateMemberPaymentDTO;
 import org.hei_school.federation_agricole.entity.MemberPayment;
 import org.hei_school.federation_agricole.service.PaymentService;
 import org.springframework.http.HttpStatus;
@@ -13,14 +14,18 @@ import java.util.stream.Collectors;
 @RequestMapping("/members")
 public class MemberPaymentController {
 
+private final PaymentService paymentService;
+public MemberPaymentController(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
 
     @PostMapping("/{id}/payments")
     public ResponseEntity<List<MemberPayment>> createPayments(
             @PathVariable String id,
-            @RequestBody ) {
+            @RequestBody List<CreateMemberPaymentDTO> dtos) {
 
         List<MemberPayment> results = dtos.stream()
-                .map(dto ->)
+                .map(dto -> paymentService.processPayment(id, dto))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(results, HttpStatus.CREATED);

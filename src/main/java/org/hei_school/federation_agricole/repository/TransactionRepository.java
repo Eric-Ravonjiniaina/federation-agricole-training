@@ -4,10 +4,7 @@ import org.hei_school.federation_agricole.config.DataSource;
 import org.hei_school.federation_agricole.entity.CollectivityTransaction;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,5 +63,20 @@ public class TransactionRepository {
         t.setCreationDate(rs.getDate("creation_date").toLocalDate());
 
         return t;
+    }
+    public void save(CollectivityTransaction tx) {
+        String sql = "INSERT INTO transactions (id, amount, account_id, member_id, payment_mode, creation_date) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tx.getId()); // N'oublie pas de générer l'ID avant
+            ps.setDouble(2, tx.getAmount());
+            ps.setString(3, tx.getAccountCredited().getId());
+            ps.setString(4, tx.getMemberDebited().getId());
+            ps.setString(5, tx.getPaymentMode());
+            ps.setDate(6, java.sql.Date.valueOf(tx.getCreationDate()));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

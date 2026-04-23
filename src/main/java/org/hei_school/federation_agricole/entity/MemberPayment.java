@@ -7,6 +7,7 @@ public class MemberPayment {
     private String id;
     private double amount;
     private PaymentMode payment;
+    private MemberEntity member;
     private MembershipFee memberShipFee;
     private FinancialAccount accountCredited;
     private LocalDate creationDate;
@@ -22,7 +23,13 @@ public class MemberPayment {
         this.accountCredited = accountCredited;
         this.creationDate = creationDate;
     }
+    public MemberEntity getMember() {
+        return member;
+    }
 
+    public void setMember(MemberEntity member) {
+        this.member = member;
+    }
     public String getId() {
         return id;
     }
