@@ -1,8 +1,10 @@
 package org.hei_school.federation_agricole.controller;
 
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
+import org.hei_school.federation_agricole.dto.request.CreateMembershipFee;
 import org.hei_school.federation_agricole.dto.response.CollectivityResponse;
 import org.hei_school.federation_agricole.entity.CollectivityTransaction;
+import org.hei_school.federation_agricole.entity.MembershipFee;
 import org.hei_school.federation_agricole.mapper.CollectivityMapper;
 import org.hei_school.federation_agricole.service.CollectivityService;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class CollectivityController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/collectivities")
     @ResponseStatus(HttpStatus.CREATED)
     public List<CollectivityResponse> create(@RequestBody List<CreateCollectivityRequest> req) {
 
@@ -30,7 +32,7 @@ public class CollectivityController {
                 .toList();
     }
 
-    @GetMapping("/{id}/transactions")
+    @GetMapping("/collectivities/{id}/transactions")
     public List<CollectivityTransaction> getTransactions(
             @PathVariable String id,
             @RequestParam String from,
@@ -42,5 +44,18 @@ public class CollectivityController {
                 LocalDate.parse(from),
                 LocalDate.parse(to)
         );
+    }
+    @GetMapping("/collectivities/{id}/membershipFees")
+    public List<MembershipFee> getMembershipFees(@PathVariable String id) {
+        return service.getMembershipFees(id);
+    }
+
+
+    @PostMapping("/collectivities/{id}/membershipFees")
+    public List<MembershipFee> createMembershipFees(
+            @PathVariable String id,
+            @RequestBody List<CreateMembershipFee> req
+    ) {
+        return service.createMembershipFees(id, req);
     }
 }

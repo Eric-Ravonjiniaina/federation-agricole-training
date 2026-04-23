@@ -28,7 +28,7 @@ public class TransactionRepository {
     ) {
 
         String sql = """
-            SELECT * FROM transactions
+            SELECT id, collectivity_id, member_id, amount, payment_mode, creation_date FROM transactions
             WHERE collectivity_id = ?
             AND creation_date BETWEEN ? AND ?
         """;

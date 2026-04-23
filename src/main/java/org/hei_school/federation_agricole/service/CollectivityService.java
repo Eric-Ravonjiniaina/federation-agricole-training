@@ -2,15 +2,14 @@ package org.hei_school.federation_agricole.service;
 
 import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
-import org.hei_school.federation_agricole.entity.Collectivity;
-import org.hei_school.federation_agricole.entity.CollectivityStructure;
-import org.hei_school.federation_agricole.entity.CollectivityTransaction;
-import org.hei_school.federation_agricole.entity.MemberEntity;
+import org.hei_school.federation_agricole.dto.request.CreateMembershipFee;
+import org.hei_school.federation_agricole.entity.*;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.ConflictException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
 import org.hei_school.federation_agricole.repository.CollectivityRepository;
 import org.hei_school.federation_agricole.repository.MemberRepository;
+import org.hei_school.federation_agricole.repository.MembershipFeeRepository;
 import org.hei_school.federation_agricole.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +22,13 @@ public class CollectivityService {
     private final TransactionRepository transactionRepository;
     private final CollectivityRepository repo;
     private final MemberRepository memberRepo;
+    private final MembershipFeeRepository feeRepo;
 
-
-    public CollectivityService(TransactionRepository transactionRepository, CollectivityRepository repo, MemberRepository memberRepo) {
+    public CollectivityService(TransactionRepository transactionRepository, CollectivityRepository repo, MemberRepository memberRepo,  MembershipFeeRepository feeRepo) {
         this.transactionRepository = transactionRepository;
         this.repo = repo;
         this.memberRepo = memberRepo;
+        this.feeRepo = feeRepo;
     }
 
     private MemberEntity getMember(String id) {
@@ -140,5 +140,50 @@ public class CollectivityService {
         }
 
         return transactionRepository.findByCollectivityAndPeriod(id, from, to);
+    }
+
+    public List<MembershipFee> getMembershipFees(String id) {
+
+        repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Collectivity not found"));
+
+        return feeRepo.findByCollectivity(id);
+    }
+
+    public List<MembershipFee> createMembershipFees(
+            String id,
+            List<CreateMembershipFee> requests
+    ) {
+
+        repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Collectivity not found"));
+
+        List<MembershipFee> result = new ArrayList<>();
+
+        for (CreateMembershipFee req : requests) {
+
+            if (req.getAmount() <= 0) {
+                throw new BadRequestException("Amount must be positive");
+            }
+
+            if (req.getFrequency() == null) {
+                throw new BadRequestException("Frequency required");
+            }
+
+            MembershipFee f = new MembershipFee();
+            f.setId(UUID.randomUUID().toString());
+            f.setCollectivityId(id);
+            f.setEligibleFrom(req.getEligibleFrom());
+            f.setFrequency(req.getFrequency());
+            f.setAmount(req.getAmount());
+            f.setLabel(req.getLabel());
+            f.setStatus("ACTIVE");
+
+            result.add(f);
+        }
+
+        feeRepo.saveAll(result);
+
+        return result;
     }
 }

@@ -7,14 +7,14 @@ public class MemberPayment {
     private String id;
     private double amount;
     private PaymentMode payment;
-    private MemberShipFee memberShipFee;
+    private MembershipFee memberShipFee;
     private FinancialAccount accountCredited;
     private LocalDate creationDate;
 
     public  MemberPayment() {
 
     }
-    public MemberPayment(String id, double amount, PaymentMode payment, MemberShipFee memberShipFee, FinancialAccount accountCredited, LocalDate creationDate) {
+    public MemberPayment(String id, double amount, PaymentMode payment, MembershipFee memberShipFee, FinancialAccount accountCredited, LocalDate creationDate) {
         this.id = id;
         this.amount = amount;
         this.payment = payment;
@@ -47,11 +47,11 @@ public class MemberPayment {
         this.payment = payment;
     }
 
-    public MemberShipFee getMemberShipFee() {
+    public MembershipFee getMemberShipFee() {
         return memberShipFee;
     }
 
-    public void setMemberShipFee(MemberShipFee memberShipFee) {
+    public void setMemberShipFee(MembershipFee memberShipFee) {
         this.memberShipFee = memberShipFee;
     }
 

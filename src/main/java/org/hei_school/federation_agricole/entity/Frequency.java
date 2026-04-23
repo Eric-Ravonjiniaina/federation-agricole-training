@@ -1,5 +1,5 @@
 package org.hei_school.federation_agricole.entity;
 
-public enum Frequence {
+public enum Frequency {
     WEEKLY, MONTHLY, ANNUALY, PUNCTUALLY
 }
