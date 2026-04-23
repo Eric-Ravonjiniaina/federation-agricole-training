@@ -188,4 +188,34 @@ public class CollectivityService {
     public List<FinancialAccount> getFinancialAccounts(String id, LocalDate atDate) {
         return accountRepository.findByCollectivityAtDate(id, atDate);
     }
+
+    public Collectivity getById(String id) {
+
+        Collectivity c = repo.findByIdWithDetails(id);
+
+        if (c == null) {
+            throw new NotFoundException("Collectivity not found");
+        }
+
+        // 🔥 enrichir les membres (IMPORTANT)
+        List<MemberEntity> fullMembers = new ArrayList<>();
+
+        for (MemberEntity m : c.getMembers()) {
+            fullMembers.add(getMember(m.getId()));
+        }
+
+        c.setMembers(fullMembers);
+
+        // 🔥 enrichir structure
+        CollectivityStructure s = c.getStructure();
+
+        if (s != null) {
+            s.setPresident(getMember(s.getPresident().getId()));
+            s.setVicePresident(getMember(s.getVicePresident().getId()));
+            s.setTreasurer(getMember(s.getTreasurer().getId()));
+            s.setSecretary(getMember(s.getSecretary().getId()));
+        }
+
+        return c;
+    }
 }

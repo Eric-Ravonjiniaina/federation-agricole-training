@@ -6,7 +6,7 @@ public class CollectivityTransaction {
 
     private String id;
     private String collectivityId;
-    private int memberId;
+    private String memberId;
     private double amount;
     private String paymentMode;
     private LocalDate creationDate;
@@ -29,11 +29,11 @@ public class CollectivityTransaction {
         this.collectivityId = collectivityId;
     }
 
-    public int getMemberId() {
+    public String getMemberId() {
         return memberId;
     }
 
-    public void setMemberId(int memberId) {
+    public void setMemberId(String memberId) {
         this.memberId = memberId;
     }
 
