@@ -1,5 +1,6 @@
 package org.hei_school.federation_agricole.controller;
 
+import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateMembershipFee;
 import org.hei_school.federation_agricole.dto.response.CollectivityResponse;
@@ -43,6 +44,15 @@ public class CollectivityController {
                 id,
                 LocalDate.parse(from),
                 LocalDate.parse(to)
+        );
+    }
+    @PutMapping("/collectivities/{id}/informations")
+    public CollectivityResponse assignIdentity(
+            @PathVariable String id,
+            @RequestBody AssignCollectivityIdentityRequest req
+    ) {
+        return CollectivityMapper.toResponse(
+                service.assignIdentity(id, req)
         );
     }
     @GetMapping("/collectivities/{id}/membershipFees")
