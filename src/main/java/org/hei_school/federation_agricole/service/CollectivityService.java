@@ -7,10 +7,7 @@ import org.hei_school.federation_agricole.entity.*;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.ConflictException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
-import org.hei_school.federation_agricole.repository.CollectivityRepository;
-import org.hei_school.federation_agricole.repository.MemberRepository;
-import org.hei_school.federation_agricole.repository.MembershipFeeRepository;
-import org.hei_school.federation_agricole.repository.TransactionRepository;
+import org.hei_school.federation_agricole.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,12 +19,14 @@ public class CollectivityService {
     private final TransactionRepository transactionRepository;
     private final CollectivityRepository repo;
     private final MemberRepository memberRepo;
+    private final AccountRepository accountRepository;
     private final MembershipFeeRepository feeRepo;
 
-    public CollectivityService(TransactionRepository transactionRepository, CollectivityRepository repo, MemberRepository memberRepo,  MembershipFeeRepository feeRepo) {
+    public CollectivityService(TransactionRepository transactionRepository, CollectivityRepository repo, MemberRepository memberRepo, AccountRepository accountRepository, MembershipFeeRepository feeRepo) {
         this.transactionRepository = transactionRepository;
         this.repo = repo;
         this.memberRepo = memberRepo;
+        this.accountRepository = accountRepository;
         this.feeRepo = feeRepo;
     }
 
@@ -186,33 +185,7 @@ public class CollectivityService {
 
         return result;
     }
-
-    public Collectivity getById(String id) {
-
-        Collectivity c = repo.findByIdWithDetails(id);
-
-        if (c == null) {
-            throw new NotFoundException("Collectivity not found");
-        }
-
-
-        List<MemberEntity> fullMembers = new ArrayList<>();
-
-        for (MemberEntity m : c.getMembers()) {
-            fullMembers.add(getMember(m.getId()));
-        }
-
-        c.setMembers(fullMembers);
-
-        CollectivityStructure s = c.getStructure();
-
-        if (s != null) {
-            s.setPresident(getMember(s.getPresident().getId()));
-            s.setVicePresident(getMember(s.getVicePresident().getId()));
-            s.setTreasurer(getMember(s.getTreasurer().getId()));
-            s.setSecretary(getMember(s.getSecretary().getId()));
-        }
-
-        return c;
+    public List<FinancialAccount> getFinancialAccounts(String id, LocalDate atDate) {
+        return accountRepository.findByCollectivityAtDate(id, atDate);
     }
 }

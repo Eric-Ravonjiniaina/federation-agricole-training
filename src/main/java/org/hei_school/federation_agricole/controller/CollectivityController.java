@@ -5,6 +5,7 @@ import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateMembershipFee;
 import org.hei_school.federation_agricole.dto.response.CollectivityResponse;
 import org.hei_school.federation_agricole.entity.CollectivityTransaction;
+import org.hei_school.federation_agricole.entity.FinancialAccount;
 import org.hei_school.federation_agricole.entity.MembershipFee;
 import org.hei_school.federation_agricole.mapper.CollectivityMapper;
 import org.hei_school.federation_agricole.service.CollectivityService;
@@ -68,9 +69,11 @@ public class CollectivityController {
     ) {
         return service.createMembershipFees(id, req);
     }
-
-    @GetMapping("/collectivities/{id}")
-    public CollectivityResponse getById(@PathVariable String id) {
-        return CollectivityMapper.toResponse(service.getById(id));
+    @GetMapping("collectivities/{id}/financialAccounts")
+    public List<FinancialAccount> getFinancialAccounts(
+            @PathVariable String id,
+            @RequestParam(name = "at") LocalDate at // Spring fait le parse tout seul ici
+    ) {
+        return service.getFinancialAccounts(id, at);
     }
 }
