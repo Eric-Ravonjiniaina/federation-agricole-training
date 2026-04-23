@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class MembreController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/members")
     public ResponseEntity<?> createMembers(@RequestBody List<MemberDTO> dtos) {
         try {
             List<MemberEntity> created = new ArrayList<>();
