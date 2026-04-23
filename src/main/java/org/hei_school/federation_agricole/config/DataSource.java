@@ -14,10 +14,9 @@ public class DataSource {
     private final String user = System.getenv("USER");
     private final String password = System.getenv("PASSWORD");
 
-    @Bean
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         try {
-            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/federation_agricole_db", "admin", "123456");
+            return DriverManager.getConnection("jdbc:postgresql://localhost:5432/federation_agricole", "postgres", "notYUSHIRO");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

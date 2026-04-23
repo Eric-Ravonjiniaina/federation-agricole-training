@@ -23,10 +23,6 @@ public class MemberService{
 
     public MemberEntity create(MemberDTO dto) throws Exception {
 
-        if (!dto.registrationFeePaid || !dto.membershipDuesPaid) {
-            throw new BadRequestException("Registration or membership dues not paid.");
-        }
-
         MemberEntity m = new MemberEntity();
         m.setFirstName(dto.firstName);
         m.setLastName(dto.lastName);
