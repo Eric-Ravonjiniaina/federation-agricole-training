@@ -57,7 +57,7 @@ public class TransactionRepository {
 
         t.setId(rs.getString("id"));
         t.setCollectivityId(rs.getString("collectivity_id"));
-        t.setMemberId(rs.getInt("member_id"));
+        t.setMemberId(rs.getString("member_id"));
         t.setAmount(rs.getDouble("amount"));
         t.setPaymentMode(rs.getString("payment_mode"));
         t.setCreationDate(rs.getDate("creation_date").toLocalDate());
