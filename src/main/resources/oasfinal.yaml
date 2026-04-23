@@ -7,6 +7,7 @@ info:
     - v0.0.1 (2026-04-21) : POST /collectivities for collectivities creation and POST /members for members creation.
     - v0.0.2 (2026-04-22) : PUT /collectivities/{id}/informations for collectivity information update.
     - v0.0.3 (2026-04-23) : New features about membership fees, collectivities transactions and its financial accounts, and members payments.
+    -v0.0.4 (2026-04-23) : '/collectivities/{id}/financialAccounts' and '/collectivities/{id}'.
   version: 0.0.1
 servers:
   - url: 'https://localhost:8080'
@@ -199,6 +200,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MemberPayment'
+  '/collectivities/{id}/financialAccounts':
+    get:
+      summary: Retrieve collectivity financial accounts at a given date
+      description: |
+        Retrieve all financial accounts (cash, bank, mobile money) of a collectivity
+        with their balance at a specific date.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: at
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        200:
+          description: List of financial accounts with their balance at given date
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FinancialAccount'
+        400:
+          description: Invalid date parameter
+        404:
+          description: Collectivity not found
+
+  '/collectivities/{id}':
+    get:
+      summary: Retrieve a collectivity by its identifier
+      description: |
+        Retrieve full collectivity information including members and structure.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Collectivity found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collectivity'
+        404:
+          description: Collectivity not found
 
 components:
   schemas:
