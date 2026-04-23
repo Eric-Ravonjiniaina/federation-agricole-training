@@ -68,4 +68,9 @@ public class CollectivityController {
     ) {
         return service.createMembershipFees(id, req);
     }
+
+    @GetMapping("/collectivities/{id}")
+    public CollectivityResponse getById(@PathVariable String id) {
+        return CollectivityMapper.toResponse(service.getById(id));
+    }
 }

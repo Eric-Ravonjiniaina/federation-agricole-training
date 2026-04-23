@@ -186,4 +186,33 @@ public class CollectivityService {
 
         return result;
     }
+
+    public Collectivity getById(String id) {
+
+        Collectivity c = repo.findByIdWithDetails(id);
+
+        if (c == null) {
+            throw new NotFoundException("Collectivity not found");
+        }
+
+
+        List<MemberEntity> fullMembers = new ArrayList<>();
+
+        for (MemberEntity m : c.getMembers()) {
+            fullMembers.add(getMember(m.getId()));
+        }
+
+        c.setMembers(fullMembers);
+
+        CollectivityStructure s = c.getStructure();
+
+        if (s != null) {
+            s.setPresident(getMember(s.getPresident().getId()));
+            s.setVicePresident(getMember(s.getVicePresident().getId()));
+            s.setTreasurer(getMember(s.getTreasurer().getId()));
+            s.setSecretary(getMember(s.getSecretary().getId()));
+        }
+
+        return c;
+    }
 }
