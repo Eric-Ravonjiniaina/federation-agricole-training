@@ -1,5 +1,6 @@
 package org.hei_school.federation_agricole.controller;
 
+import org.hei_school.federation_agricole.dto.CollectivityLocalStatistics;
 import org.hei_school.federation_agricole.dto.request.AssignCollectivityIdentityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateCollectivityRequest;
 import org.hei_school.federation_agricole.dto.request.CreateMembershipFee;
@@ -8,6 +9,7 @@ import org.hei_school.federation_agricole.entity.CollectivityTransaction;
 import org.hei_school.federation_agricole.entity.FinancialAccount;
 import org.hei_school.federation_agricole.entity.MembershipFee;
 import org.hei_school.federation_agricole.mapper.CollectivityMapper;
+import org.hei_school.federation_agricole.repository.StatisticsRepository;
 import org.hei_school.federation_agricole.service.CollectivityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,11 @@ import java.util.List;
 public class CollectivityController {
 
     private final CollectivityService service;
+    private final StatisticsRepository repository;
 
-    public CollectivityController(CollectivityService service) {
+    public CollectivityController(CollectivityService service, StatisticsRepository repository) {
         this.service = service;
+        this.repository = repository;
     }
 
     @PostMapping("/collectivities")
@@ -47,6 +51,7 @@ public class CollectivityController {
                 LocalDate.parse(to)
         );
     }
+
     @PutMapping("/collectivities/{id}/informations")
     public CollectivityResponse assignIdentity(
             @PathVariable String id,
@@ -56,6 +61,7 @@ public class CollectivityController {
                 service.assignIdentity(id, req)
         );
     }
+
     @GetMapping("/collectivities/{id}/membershipFees")
     public List<MembershipFee> getMembershipFees(@PathVariable String id) {
         return service.getMembershipFees(id);
@@ -80,5 +86,13 @@ public class CollectivityController {
             @RequestParam(name = "at") LocalDate at // Spring fait le parse tout seul ici
     ) {
         return service.getFinancialAccounts(id, at);
+    }
+
+    @GetMapping("/collectivities/{id}/statistics")
+    public List<CollectivityLocalStatistics> getStatistics(String id, String from, String to) {
+        LocalDate fromDate = LocalDate.parse(from);
+        LocalDate toDate = LocalDate.parse(to);
+
+        return repository.getStatistics(id, fromDate, toDate);
     }
 }

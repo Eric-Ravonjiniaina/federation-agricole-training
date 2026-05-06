@@ -7,9 +7,18 @@ public class MembershipFee {
     private String collectivityId;
     private LocalDate eligibleFrom;
     private Frequency frequency;
+    private ActivityStatus activityStatus;
     private double amount;
     private String label;
     private String status;
+
+    public ActivityStatus getActivityStatus() {
+        return activityStatus;
+    }
+
+    public void setActivityStatus(ActivityStatus activityStatus) {
+        this.activityStatus = activityStatus;
+    }
 
     public String getId() {
         return id;
