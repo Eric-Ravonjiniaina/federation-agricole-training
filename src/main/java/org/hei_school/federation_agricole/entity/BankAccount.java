@@ -1,23 +1,18 @@
 package org.hei_school.federation_agricole.entity;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class BankAccount extends FinancialAccount {
     private String holderName;
-    private String bankName;
-    private String bankCode;
-    private String bankBranchCode;
-    private String bankAccountNumber;
-    private String bankAccountKey;
-
-    public String getHolderName() { return holderName; }
-    public void setHolderName(String holderName) { this.holderName = holderName; }
-    public String getBankName() { return bankName; }
-    public void setBankName(String bankName) { this.bankName = bankName; }
-    public String getBankCode() { return bankCode; }
-    public void setBankCode(String bankCode) { this.bankCode = bankCode; }
-    public String getBankBranchCode() { return bankBranchCode; }
-    public void setBankBranchCode(String bankBranchCode) { this.bankBranchCode = bankBranchCode; }
-    public String getBankAccountNumber() { return bankAccountNumber; }
-    public void setBankAccountNumber(String bankAccountNumber) { this.bankAccountNumber = bankAccountNumber; }
-    public String getBankAccountKey() { return bankAccountKey; }
-    public void setBankAccountKey(String bankAccountKey) { this.bankAccountKey = bankAccountKey; }
+    private Bank bankName;
+    private Integer bankCode;
+    private Integer branchCode;
+    private Integer accountNumber;
+    private Integer accountKey;
 }

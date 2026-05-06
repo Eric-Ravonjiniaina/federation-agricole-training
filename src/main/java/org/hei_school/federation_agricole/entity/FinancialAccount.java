@@ -1,17 +1,37 @@
 package org.hei_school.federation_agricole.entity;
 
-public abstract class FinancialAccount {
-    private String id;
-    private Double amount;
-    private Collectivity collectivity;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
 
-    public Collectivity getCollectivity() { return collectivity; }
-    public void setCollectivity(Collectivity collectivity) { this.collectivity = collectivity; }
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = "transactions")
+@EqualsAndHashCode(exclude = "transactions")
+public class FinancialAccount {
+    protected String id;
+    protected List<Transaction> transactions;
+
+    public List<Transaction> addTransactions(List<Transaction> newTransactions) {
+        if (this.transactions == null) {
+            this.transactions = new ArrayList<>();
+        }
+        this.transactions.addAll(newTransactions);
+        return this.transactions;
+    }
+
+    public Double getBalanceAt(LocalDate at) {
+        return transactions.stream()
+                .filter(transaction -> !transaction.getCreationDate().isAfter(at))
+                .map(Transaction::getAmount)
+                .reduce(0.0, Double::sum);
+    }
 }
 

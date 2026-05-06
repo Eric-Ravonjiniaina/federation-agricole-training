@@ -1,83 +1,37 @@
 package org.hei_school.federation_agricole.entity;
 
+import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Collectivity {
     private String id;
-    private String location;
-    private String number;
     private String name;
-    private CollectivityStructure structure;
-    private List<MemberEntity> members;
+    private Integer number;
+    private String location;
+    private String specialization;
+    private CollectivityStructure collectivityStructure;
+    private List<Member> members;
+    private Boolean federationApproval;
 
-
-    public Collectivity() {
+    public boolean hasEnoughMembers() {
+        return members.size() >= 10;
     }
 
-    public Collectivity(String id, String location, String number, String name, CollectivityStructure structure, List<MemberEntity> members) {
-        this.id = id;
-        this.location = location;
-        this.number = number;
-        this.name = name;
-        this.structure = structure;
-        this.members = members;
-    }
+    public List<Member> addMembers(List<Member> newMembers) {
+        if(members == null){
+            members = new ArrayList<>();
+        }
+        for (Member member : newMembers) {
+            member.getCollectivities().add(this);
+        }
+        members.addAll(newMembers);
 
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public CollectivityStructure getStructure() {
-        return structure;
-    }
-
-    public void setStructure(CollectivityStructure structure) {
-        this.structure = structure;
-    }
-
-    public List<MemberEntity> getMembers() {
         return members;
-    }
-
-    public void setMembers(List<MemberEntity> members) {
-        this.members = members;
-    }
-
-    @Override
-    public String toString() {
-        return "Collectivity{" +
-                "id='" + id + '\'' +
-                ", location='" + location + '\'' +
-                ", structure=" + structure +
-                ", members=" + members +
-                '}';
     }
 }

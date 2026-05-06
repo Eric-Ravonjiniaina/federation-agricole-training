@@ -9,5 +9,5 @@ public enum Bank {
     AFG,
     ACCES_BAQUE,
     BAOBAB,
-    SIPEM;
+    SIPEM
 }
