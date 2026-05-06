@@ -74,7 +74,7 @@ public class CollectivityController {
     ) {
         return service.createMembershipFees(id, req);
     }
-    @GetMapping("collectivities/{id}/financialAccounts")
+    @GetMapping("/collectivities/{id}/financialAccounts")
     public List<FinancialAccount> getFinancialAccounts(
             @PathVariable String id,
             @RequestParam(name = "at") LocalDate at // Spring fait le parse tout seul ici

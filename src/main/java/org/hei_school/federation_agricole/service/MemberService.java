@@ -2,55 +2,68 @@ package org.hei_school.federation_agricole.service;
 
 import org.hei_school.federation_agricole.config.DataSource;
 import org.hei_school.federation_agricole.dto.MemberDTO;
-import org.hei_school.federation_agricole.entity.MemberEntity;
+import org.hei_school.federation_agricole.entity.*;
 import org.hei_school.federation_agricole.exception.BadRequestException;
+import org.hei_school.federation_agricole.exception.NotFoundException;
 import org.hei_school.federation_agricole.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class MemberService{
-    private final MemberRepository repository;
-    private final DataSource dataSource;
+public class MemberService {
 
-    public MemberService(MemberRepository repository, DataSource dataSource) { this.repository = repository;
-        this.dataSource = dataSource;
+    private final MemberRepository repository;
+
+    public MemberService(MemberRepository repository) {
+        this.repository = repository;
     }
 
     public MemberEntity create(MemberDTO dto) throws Exception {
+        // Validations OAS
+        if (!dto.isRegistrationFeePaid()) {
+            throw new BadRequestException("Registration fee not paid");
+        }
+        if (!dto.isMembershipDuesPaid()) {
+            throw new BadRequestException("Membership dues not paid");
+        }
+        if (dto.getRefereeIds() == null || dto.getRefereeIds().size() < 2) {
+            throw new BadRequestException("At least 2 referees required");
+        }
 
         MemberEntity m = new MemberEntity();
-        m.setFirstName(dto.firstName);
-        m.setLastName(dto.lastName);
-        String generatedId = repository.save(m, dto.collectivityIdentifier);
+        m.setId(UUID.randomUUID().toString());
+        m.setFirstName(dto.getFirstName());
+        m.setLastName(dto.getLastName());
+        if (dto.getBirthDate() != null) m.setBirthDate(LocalDate.parse(dto.getBirthDate()));
+        if (dto.getGender() != null) m.setGender(GenderEnum.valueOf(dto.getGender()));
+        m.setAddress(dto.getAddress());
+        m.setProfession(dto.getProfession());
+        m.setPhoneNumber(dto.getPhoneNumber());
+        m.setEmail(dto.getEmail());
+        if (dto.getOccupation() != null) m.setOccupation(MemberOccupation.valueOf(dto.getOccupation()));
 
-        m.setId(generatedId);
+        repository.save(m);
+
+        // Vérifier et sauvegarder les référents
+        for (String refId : dto.getRefereeIds()) {
+            repository.findById(refId)
+                    .orElseThrow(() -> new NotFoundException("Referee not found: " + refId));
+        }
+        repository.saveReferees(m.getId(), dto.getRefereeIds());
+
+        // Charger les référents pour la réponse
+        List<MemberEntity> referees = repository.findRefereesByMemberId(m.getId());
+        m.setReferees(referees);
 
         return m;
     }
+
     public Optional<MemberEntity> findById(String id) {
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT id FROM members WHERE id = ?")) {
-
-            ps.setString(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                MemberEntity m = new MemberEntity();
-                m.setId(rs.getString("id"));
-                return Optional.of(m);
-            }
-
-            return Optional.empty();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return repository.findById(id);
     }
 }
