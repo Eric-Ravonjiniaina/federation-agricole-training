@@ -18,15 +18,15 @@ public class StatisticsRepository {
 
     public List<CollectivityLocalStatistics> getStatistics(String collectivityId, LocalDate from, LocalDate to) {
         String sql = """
-        SELECT m.id, m.first_name, m.last_name, m.email, m.occupation,
+        SELECT m.id, m.first_name,\s
                SUM(CASE WHEN p.status = 'PAID' THEN p.amount ELSE 0 END) as earned,
                SUM(CASE WHEN p.status = 'UNPAID' AND mf.activity_status = 'ACTIVE' THEN mf.amount ELSE 0 END) as unpaid
         FROM members m
         LEFT JOIN payments p ON m.id = p.member_id
         LEFT JOIN membership_fees mf ON p.fee_id = mf.id
-        WHERE m.collectivity_id = ? 
+        WHERE m.collectivity_id = ?\s
           AND p.creation_date BETWEEN ? AND ?
-        GROUP BY m.id, m.first_name, m.last_name, m.email, m.occupation
+        GROUP BY m.id;
     """;
 
         List<CollectivityLocalStatistics> stats = new ArrayList<>();
