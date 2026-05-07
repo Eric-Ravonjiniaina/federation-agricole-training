@@ -1,12 +1,12 @@
 package org.hei_school.federation_agricole.controller.mapper;
 
-
 import org.hei_school.federation_agricole.controller.dto.Bank;
+import org.hei_school.federation_agricole.controller.dto.FinancialAccount;
+import org.hei_school.federation_agricole.controller.dto.MobileBankingService;
 import org.hei_school.federation_agricole.entity.BankAccount;
 import org.hei_school.federation_agricole.entity.CashAccount;
-import org.hei_school.federation_agricole.entity.FinancialAccount;
+import org.hei_school.federation_agricole.entity.MobileBankingAccount;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 
 import static java.time.LocalDate.now;
@@ -32,7 +32,7 @@ public class FinancialAccountDtoMapper {
                     .amount(bankAccount.getBalanceAt(balanceAt))
                     .build();
         } else if (financialAccount instanceof MobileBankingAccount mobileBankingAccount) {
-            return edu.hei.school.agricultural.controller.dto.MobileBankingAccount.builder()
+            return org.hei_school.federation_agricole.controller.dto.MobileBankingAccount.builder()
                     .id(mobileBankingAccount.getId())
                     .holderName(mobileBankingAccount.getHolderName())
                     .mobileNumber(mobileBankingAccount.getMobileNumber())
@@ -43,7 +43,7 @@ public class FinancialAccountDtoMapper {
         throw new IllegalArgumentException("Unknown financial account type " + financialAccount.getClass().getName());
     }
 
-    public FinancialAccount mapToDto(edu.hei.school.agricultural.entity.FinancialAccount financialAccount) {
+    public FinancialAccount mapToDto(org.hei_school.federation_agricole.entity.FinancialAccount financialAccount) {
         return  mapToDto(financialAccount, now());
     }
 

@@ -2,6 +2,12 @@ package org.hei_school.federation_agricole.controller.mapper;
 
 
 import lombok.RequiredArgsConstructor;
+import org.hei_school.federation_agricole.controller.dto.CreateMemberPayment;
+import org.hei_school.federation_agricole.entity.*;
+import org.hei_school.federation_agricole.exception.NotFoundException;
+import org.hei_school.federation_agricole.repository.FinancialAccountRepository;
+import org.hei_school.federation_agricole.repository.MemberRepository;
+import org.hei_school.federation_agricole.repository.MembershipFeeRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,10 +38,10 @@ public class MemberPaymentDtoMaper {
                 .build();
     }
 
-    public edu.hei.school.agricultural.controller.dto.MemberPayment mapToDto(MemberPayment memberPayment) {
-        return edu.hei.school.agricultural.controller.dto.MemberPayment.builder()
+    public org.hei_school.federation_agricole.controller.dto.MemberPayment mapToDto(MemberPayment memberPayment) {
+        return org.hei_school.federation_agricole.controller.dto.MemberPayment.builder()
                 .id(memberPayment.getId())
-                .paymentMode(memberPayment.getPaymentMode() == null ? null : edu.hei.school.agricultural.controller.dto.PaymentMode.valueOf(memberPayment.getPaymentMode().name()))
+                .paymentMode(memberPayment.getPaymentMode() == null ? null : org.hei_school.federation_agricole.controller.dto.PaymentMode.valueOf(memberPayment.getPaymentMode().name()))
                 .accountCredited(financialAccountDtoMapper.mapToDto(memberPayment.getAccountCredited()))
                 .creationDate(memberPayment.getCreationDate())
                 .amount(memberPayment.getAmount())
