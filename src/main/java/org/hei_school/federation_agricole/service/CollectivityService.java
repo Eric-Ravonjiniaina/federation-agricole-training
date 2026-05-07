@@ -1,12 +1,15 @@
 package org.hei_school.federation_agricole.service;
 
 import lombok.RequiredArgsConstructor;
+
+import org.hei_school.federation_agricole.controller.dto.CollectivityLocalStatistics;
 import org.hei_school.federation_agricole.entity.*;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
 import org.hei_school.federation_agricole.repository.CollectivityRepository;
 import org.hei_school.federation_agricole.repository.FinancialAccountRepository;
 import org.hei_school.federation_agricole.repository.MembershipFeeRepository;
+import org.hei_school.federation_agricole.repository.StatisticsRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +27,7 @@ public class CollectivityService {
     private final CollectivityRepository collectivityRepository;
     private final MembershipFeeRepository membershipFeeRepository;
     private final FinancialAccountRepository financialAccountRepository;
+    private final StatisticsRepository statisticsRepository;
 
     public List<Collectivity> createCollectivities(List<Collectivity> collectivities) {
         for (Collectivity collectivity : collectivities) {
@@ -129,5 +133,8 @@ public class CollectivityService {
                     throw new IllegalArgumentException("Unknown financial account type " + financialAccount.getClass().getTypeName());
         };
         return paymentMode;
+    }
+    public List<CollectivityLocalStatistics> getStatistics(String id, LocalDate from, LocalDate to) {
+        return statisticsRepository.getStatistics(id, from, to);
     }
 }
