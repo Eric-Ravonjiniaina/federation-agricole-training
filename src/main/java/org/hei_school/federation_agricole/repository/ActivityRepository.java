@@ -1,13 +1,16 @@
 package org.hei_school.federation_agricole.repository;
 
-import org.hei_school.federation_agricole.controller.dto.Activity;
 import org.hei_school.federation_agricole.datasource.DataSource;
-import org.hei_school.federation_agricole.exception.BadRequestException;
+import org.hei_school.federation_agricole.entity.ActivityDayOfWeek;
+import org.hei_school.federation_agricole.entity.ActivityType;
+import org.hei_school.federation_agricole.entity.CollectivityActivity;
+import org.hei_school.federation_agricole.entity.MemberOccupation;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class ActivityRepository {
@@ -17,53 +20,123 @@ public class ActivityRepository {
         this.dataSource = dataSource;
     }
 
-    public List<Activity> saveAll(String collectivityId, List<Activity> activities) {
-        String sql = "INSERT INTO \"activity\" (id, label, description, activity_date, collectivity_id) " +
-                "VALUES (?, ?, ?, ?, ?)";
+    public List<CollectivityActivity> getByCollectivityId(String collectivityId) {
+        String sql = "SELECT ca.id, ca.label, ca.activity_type, ca.executive_date, " +
+                "ca.week_ordinal, ca.day_of_week, " +
+                "aoc.occupation " +
+                "FROM collectivity_activity ca " +
+                "LEFT JOIN activity_occupation_concerned aoc ON ca.id = aoc.activity_id " +
+                "WHERE ca.collectivity_id = ? " +
+                "ORDER BY ca.id";
+
+        List<CollectivityActivity> activities = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            for (Activity activity : activities) {
-                pstmt.setString(1, activity.id());
-                pstmt.setString(2, activity.label());
-                pstmt.setString(3, activity.description());
-                pstmt.setDate(4, Date.valueOf(activity.activityDate()));
-                pstmt.setString(5, collectivityId);
-                pstmt.addBatch();
-            }
+            stmt.setString(1, collectivityId);
 
-            pstmt.executeBatch();
-            return activities;
+            try (ResultSet rs = stmt.executeQuery()) {
+                String currentId = null;
+                CollectivityActivity current = null;
 
-        } catch (BadRequestException e) {
-            throw new RuntimeException("Erreur lors de la création des activités", e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public List<Activity> findAllByCollectivityId(String collectivityId) {
-        List<Activity> activities = new ArrayList<>();
-        String sql = "SELECT id, label, description, activity_date FROM \"activity\" WHERE collectivity_id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, collectivityId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    activities.add(new Activity(
-                            rs.getString("id"),
-                            rs.getString("label"),
-                            rs.getString("description"),
-                            rs.getDate("activity_date").toLocalDate()
-                    ));
+                    String id = rs.getString("id");
+
+                    if (!id.equals(currentId)) {
+                        current = new CollectivityActivity();
+                        current.setId(id);
+                        current.setCollectivityId(collectivityId);
+                        current.setLabel(rs.getString("label"));
+                        current.setActivityType(ActivityType.valueOf(rs.getString("activity_type")));
+                        current.setMemberOccupationConcerned(new ArrayList<>());
+
+                        Date execDate = rs.getDate("executive_date");
+                        if (execDate != null) current.setExecutiveDate(execDate.toLocalDate());
+
+                        String weekOrdinal = rs.getString("week_ordinal");
+                        if (weekOrdinal != null) current.setWeekOrdinal(Integer.parseInt(weekOrdinal));
+
+                        String dayOfWeek = rs.getString("day_of_week");
+                        if (dayOfWeek != null) current.setDayOfWeek(ActivityDayOfWeek.valueOf(dayOfWeek));
+
+                        activities.add(current);
+                        currentId = id;
+                    }
+
+                    String occupation = rs.getString("occupation");
+                    if (occupation != null) {
+                        current.getMemberOccupationConcerned().add(MemberOccupation.valueOf(occupation));
+                    }
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la récupération des activités", e);
+            throw new RuntimeException("Erreur base de données", e);
         }
+
         return activities;
+    }
+
+    public List<CollectivityActivity> save(String collectivityId, List<CollectivityActivity> activities) {
+        String sqlActivity = "INSERT INTO collectivity_activity " +
+                "(id, collectivity_id, label, activity_type, executive_date, week_ordinal, day_of_week) " +
+                "VALUES (?, ?, ?, ?::activity_type, ?, ?, ?::activity_day_of_week)";
+
+        String sqlOccupation = "INSERT INTO activity_occupation_concerned " +
+                "(id, activity_id, occupation) VALUES (?, ?, ?::member_occupation)";
+
+        List<CollectivityActivity> saved = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection()) {
+            for (CollectivityActivity activity : activities) {
+                String id = UUID.randomUUID().toString();
+                activity.setId(id);
+                activity.setCollectivityId(collectivityId);
+
+                try (PreparedStatement stmt = conn.prepareStatement(sqlActivity)) {
+                    stmt.setString(1, id);
+                    stmt.setString(2, collectivityId);
+                    stmt.setString(3, activity.getLabel());
+                    stmt.setString(4, activity.getActivityType().name());
+
+                    if (activity.getExecutiveDate() != null) {
+                        stmt.setDate(5, Date.valueOf(activity.getExecutiveDate()));
+                    } else {
+                        stmt.setNull(5, Types.DATE);
+                    }
+
+                    if (activity.getWeekOrdinal() != null) {
+                        stmt.setInt(6, activity.getWeekOrdinal());
+                    } else {
+                        stmt.setNull(6, Types.INTEGER);
+                    }
+
+                    if (activity.getDayOfWeek() != null) {
+                        stmt.setString(7, activity.getDayOfWeek().name());
+                    } else {
+                        stmt.setNull(7, Types.VARCHAR);
+                    }
+
+                    stmt.executeUpdate();
+                }
+
+                if (activity.getMemberOccupationConcerned() != null) {
+                    for (MemberOccupation occ : activity.getMemberOccupationConcerned()) {
+                        try (PreparedStatement stmt2 = conn.prepareStatement(sqlOccupation)) {
+                            stmt2.setString(1, UUID.randomUUID().toString());
+                            stmt2.setString(2, id);
+                            stmt2.setString(3, occ.name());
+                            stmt2.executeUpdate();
+                        }
+                    }
+                }
+
+                saved.add(activity);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur base de données", e);
+        }
+
+        return saved;
     }
 }

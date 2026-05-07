@@ -27,6 +27,7 @@ public class CollectivityService {
     private final FinancialAccountRepository financialAccountRepository;
     private final StatisticsRepository statisticsRepository;
     private final MemberRepository memberRepo;
+    private final ActivityRepository activityRepository;
 
     public List<Collectivity> createCollectivities(List<Collectivity> collectivities) {
         for (Collectivity collectivity : collectivities) {
@@ -146,5 +147,25 @@ public class CollectivityService {
         }
 
         return memberRepo.getStatistics(from, to);
+    }
+    public List<CollectivityActivity> getActivities(String collectivityId) {
+        getCollectivityById(collectivityId);
+        return activityRepository.getByCollectivityId(collectivityId);
+    }
+    public List<CollectivityActivity> createActivities(String collectivityId, List<CollectivityActivity> activities) {
+        getCollectivityById(collectivityId);
+
+        for (CollectivityActivity activity : activities) {
+            boolean hasRecurrence = activity.getWeekOrdinal() != null || activity.getDayOfWeek() != null;
+            boolean hasExecutiveDate = activity.getExecutiveDate() != null;
+
+            if (hasRecurrence && hasExecutiveDate) {
+                throw new BadRequestException(
+                        "Cannot provide both recurrenceRule and executiveDate at the same time"
+                );
+            }
+        }
+
+        return activityRepository.save(collectivityId, activities);
     }
 }

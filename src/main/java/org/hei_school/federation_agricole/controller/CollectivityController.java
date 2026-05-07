@@ -2,15 +2,10 @@ package org.hei_school.federation_agricole.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.hei_school.federation_agricole.controller.dto.CollectivityInformation;
-import org.hei_school.federation_agricole.controller.dto.CollectivityStatisticsResponse;
-import org.hei_school.federation_agricole.controller.dto.CreateCollectivity;
-import org.hei_school.federation_agricole.controller.dto.CreateMembershipFee;
-import org.hei_school.federation_agricole.controller.mapper.CollectivityDtoMapper;
-import org.hei_school.federation_agricole.controller.mapper.FinancialAccountDtoMapper;
-import org.hei_school.federation_agricole.controller.mapper.MembershipFeeDtoMapper;
-import org.hei_school.federation_agricole.controller.mapper.TransactionDtoMapper;
+import org.hei_school.federation_agricole.controller.dto.*;
+import org.hei_school.federation_agricole.controller.mapper.*;
 import org.hei_school.federation_agricole.entity.Collectivity;
+import org.hei_school.federation_agricole.entity.CollectivityActivity;
 import org.hei_school.federation_agricole.entity.MembershipFee;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
@@ -32,6 +27,7 @@ public class CollectivityController {
     private final CollectivityService collectivityService;
     private final FinancialAccountDtoMapper financialAccountDtoMapper;
     private final TransactionDtoMapper transactionDtoMapper;
+    private final ActivityDtoMapper activityDtoMapper;
 
     @GetMapping("/collectivities/{id}")
     public ResponseEntity<?> getCollectivityById(@PathVariable String id) {
@@ -204,5 +200,41 @@ public class CollectivityController {
                 LocalDate.parse(from),
                 LocalDate.parse(to)
         );
+    }
+    @GetMapping("/collectivities/{id}/activities")
+    public ResponseEntity<?> getCollectivityActivities(@PathVariable String id) {
+        try {
+            return ResponseEntity.status(OK)
+                    .body(collectivityService.getActivities(id).stream()
+                            .map(activityDtoMapper::mapToDto)
+                            .toList());
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/collectivities/{id}/activities")
+    public ResponseEntity<?> createCollectivityActivities(
+            @PathVariable String id,
+            @RequestBody List<CreateCollectivityActivityDto> createActivities) {
+        try {
+            List<CollectivityActivity> activities = createActivities.stream()
+                    .map(activityDtoMapper::mapToEntity)
+                    .toList();
+            return ResponseEntity.status(OK)
+                    .body(collectivityService.createActivities(id, activities).stream()
+                            .map(activityDtoMapper::mapToDto)
+                            .toList());
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(e.getMessage());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }
