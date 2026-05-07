@@ -1,5 +1,8 @@
 package org.hei_school.federation_agricole.mapper;
 
+import org.hei_school.federation_agricole.entity.Gender;
+import org.hei_school.federation_agricole.entity.Member;
+import org.hei_school.federation_agricole.entity.MemberOccupation;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;

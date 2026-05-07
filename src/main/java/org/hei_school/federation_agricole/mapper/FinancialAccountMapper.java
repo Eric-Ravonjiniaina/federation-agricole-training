@@ -1,6 +1,7 @@
 package org.hei_school.federation_agricole.mapper;
 
 import org.springframework.stereotype.Component;
+import org.hei_school.federation_agricole.entity.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

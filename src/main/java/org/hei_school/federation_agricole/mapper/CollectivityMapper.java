@@ -1,8 +1,11 @@
 package org.hei_school.federation_agricole.mapper;
 
-
+import org.hei_school.federation_agricole.entity.Collectivity;
+import org.hei_school.federation_agricole.entity.CollectivityStructure;
+import org.hei_school.federation_agricole.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

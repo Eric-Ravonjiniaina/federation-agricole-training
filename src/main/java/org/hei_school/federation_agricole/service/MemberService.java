@@ -1,6 +1,5 @@
 package org.hei_school.federation_agricole.service;
 
-import lombok.RequiredArgsConstructor;
 import org.hei_school.federation_agricole.entity.Member;
 import org.hei_school.federation_agricole.entity.MemberPayment;
 import org.hei_school.federation_agricole.entity.Transaction;
@@ -8,14 +7,14 @@ import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.repository.MemberPaymentRepository;
 import org.hei_school.federation_agricole.repository.MemberRepository;
 import org.hei_school.federation_agricole.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static edu.hei.school.agricultural.entity.TransactionType.IN;
+import static org.hei_school.federation_agricole.entity.TransactionType.IN;
 import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
-import static org.hei_school.federation_agricole.entity.TransactionType.IN;
 
 @Service
 @RequiredArgsConstructor
