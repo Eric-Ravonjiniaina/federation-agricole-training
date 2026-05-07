@@ -3,6 +3,7 @@ package org.hei_school.federation_agricole.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.hei_school.federation_agricole.controller.dto.CollectivityInformation;
+import org.hei_school.federation_agricole.controller.dto.CollectivityStatisticsResponse;
 import org.hei_school.federation_agricole.controller.dto.CreateCollectivity;
 import org.hei_school.federation_agricole.controller.dto.CreateMembershipFee;
 import org.hei_school.federation_agricole.controller.mapper.CollectivityDtoMapper;
@@ -192,5 +193,16 @@ public class CollectivityController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
+    }
+    @GetMapping("/collectivities/statistics")
+    public CollectivityStatisticsResponse getStatistics(
+            @RequestParam String from,
+            @RequestParam String to
+    ) {
+
+        return collectivityService.getStatistics(
+                LocalDate.parse(from),
+                LocalDate.parse(to)
+        );
     }
 }

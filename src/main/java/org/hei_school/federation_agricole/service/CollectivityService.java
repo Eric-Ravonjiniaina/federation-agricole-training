@@ -3,13 +3,11 @@ package org.hei_school.federation_agricole.service;
 import lombok.RequiredArgsConstructor;
 
 import org.hei_school.federation_agricole.controller.dto.CollectivityLocalStatistics;
+import org.hei_school.federation_agricole.controller.dto.CollectivityStatisticsResponse;
 import org.hei_school.federation_agricole.entity.*;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.hei_school.federation_agricole.exception.NotFoundException;
-import org.hei_school.federation_agricole.repository.CollectivityRepository;
-import org.hei_school.federation_agricole.repository.FinancialAccountRepository;
-import org.hei_school.federation_agricole.repository.MembershipFeeRepository;
-import org.hei_school.federation_agricole.repository.StatisticsRepository;
+import org.hei_school.federation_agricole.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,6 +26,7 @@ public class CollectivityService {
     private final MembershipFeeRepository membershipFeeRepository;
     private final FinancialAccountRepository financialAccountRepository;
     private final StatisticsRepository statisticsRepository;
+    private final MemberRepository memberRepo;
 
     public List<Collectivity> createCollectivities(List<Collectivity> collectivities) {
         for (Collectivity collectivity : collectivities) {
@@ -136,5 +135,16 @@ public class CollectivityService {
     }
     public List<CollectivityLocalStatistics> getStatistics(String id, LocalDate from, LocalDate to) {
         return statisticsRepository.getStatistics(id, from, to);
+    }
+    public CollectivityStatisticsResponse getStatistics(
+            LocalDate from,
+            LocalDate to
+    ) {
+
+        if (from.isAfter(to)) {
+            throw new BadRequestException("Invalid date range");
+        }
+
+        return memberRepo.getStatistics(from, to);
     }
 }

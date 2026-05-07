@@ -1,15 +1,14 @@
 package org.hei_school.federation_agricole.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.hei_school.federation_agricole.controller.dto.CollectivityStatisticsResponse;
 import org.hei_school.federation_agricole.entity.Collectivity;
 import org.hei_school.federation_agricole.entity.Member;
 import org.hei_school.federation_agricole.mapper.MemberMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -150,6 +149,117 @@ public class MemberRepository {
                 memberList.add(memberMapper.mapFromResultSet(resultSet));
             }
             return memberList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public CollectivityStatisticsResponse getStatistics(LocalDate from, LocalDate to) {
+
+        String sql = """
+        SELECT
+            COUNT(DISTINCT m.id) AS total_members,
+
+            COUNT(DISTINCT CASE
+                WHEN mp.amount >= dues.total_due
+                THEN m.id
+            END) AS up_to_date_members
+
+        FROM member m
+
+        LEFT JOIN (
+            SELECT
+                cm.member_id,
+
+                COALESCE(SUM(
+                    CASE mf.frequency
+
+                        WHEN 'PUNCTUALLY' THEN
+                            CASE
+                                WHEN mf.eligible_from BETWEEN ? AND ?
+                                THEN mf.amount
+                                ELSE 0
+                            END
+
+                        WHEN 'MONTHLY' THEN
+                            mf.amount * (
+                                EXTRACT(YEAR FROM AGE(?, mf.eligible_from)) * 12
+                                + EXTRACT(MONTH FROM AGE(?, mf.eligible_from))
+                                + 1
+                            )
+
+                        WHEN 'ANNUALLY' THEN
+                            mf.amount * (
+                                EXTRACT(YEAR FROM AGE(?, mf.eligible_from))
+                                + 1
+                            )
+
+                        ELSE 0
+                    END
+                ), 0) AS total_due
+
+            FROM collectivity_member cm
+
+            JOIN membership_fee mf
+                ON mf.collectivity_id = cm.collectivity_id
+
+            WHERE mf.status = 'ACTIVE'
+
+            GROUP BY cm.member_id
+        ) dues
+            ON dues.member_id = m.id
+
+        LEFT JOIN (
+            SELECT
+                member_debited_id,
+                SUM(amount) AS amount
+            FROM member_payment
+            WHERE creation_date BETWEEN ? AND ?
+            GROUP BY member_debited_id
+        ) mp
+            ON mp.member_debited_id = m.id
+    """;
+
+        try (PreparedStatement preparedStatement =
+                     connection.prepareStatement(sql)) {
+
+            preparedStatement.setDate(1, Date.valueOf(from));
+            preparedStatement.setDate(2, Date.valueOf(to));
+
+            preparedStatement.setDate(3, Date.valueOf(to));
+            preparedStatement.setDate(4, Date.valueOf(to));
+
+            preparedStatement.setDate(5, Date.valueOf(to));
+
+            preparedStatement.setDate(6, Date.valueOf(from));
+            preparedStatement.setDate(7, Date.valueOf(to));
+
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+
+                int totalMembers = rs.getInt("total_members");
+                int upToDateMembers = rs.getInt("up_to_date_members");
+
+                double percentage = 0;
+
+                if (totalMembers > 0) {
+                    percentage =
+                            (upToDateMembers * 100.0) / totalMembers;
+                }
+
+                CollectivityStatisticsResponse response =
+                        new CollectivityStatisticsResponse();
+
+                response.setNewMembersCount(totalMembers);
+
+                response.setUpToDateMembersPercentage(percentage);
+
+                return response;
+            }
+
+            return new CollectivityStatisticsResponse();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
