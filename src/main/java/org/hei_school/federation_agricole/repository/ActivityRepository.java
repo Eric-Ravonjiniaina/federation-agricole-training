@@ -5,10 +5,8 @@ import org.hei_school.federation_agricole.datasource.DataSource;
 import org.hei_school.federation_agricole.exception.BadRequestException;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -43,5 +41,29 @@ public class ActivityRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    public List<Activity> findAllByCollectivityId(String collectivityId) {
+        List<Activity> activities = new ArrayList<>();
+        String sql = "SELECT id, label, description, activity_date FROM \"activity\" WHERE collectivity_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, collectivityId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    activities.add(new Activity(
+                            rs.getString("id"),
+                            rs.getString("label"),
+                            rs.getString("description"),
+                            rs.getDate("activity_date").toLocalDate()
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération des activités", e);
+        }
+        return activities;
     }
 }

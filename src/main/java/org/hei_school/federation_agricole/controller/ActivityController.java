@@ -21,4 +21,8 @@ public class ActivityController {
             @RequestBody List<Activity> activities) {
         return repository.saveAll(id, activities);
     }
+    @GetMapping
+    public List<Activity> getActivities(@PathVariable String id) {
+        return repository.findAllByCollectivityId(id);
+    }
 }
